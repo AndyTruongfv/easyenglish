@@ -5,7 +5,7 @@ import { getMyDashboard } from "@/lib/gamification.functions";
 import { useEffect, useState } from "react";
 import { Lesson } from "@/data/courses";
 import { getCustomLessons } from "@/lib/custom_lessons";
-import { BookOpen, Target, Newspaper, Music, GraduationCap, ChevronDown, Check, Lock } from "lucide-react";
+import { BookOpen, Target, Newspaper, Music, GraduationCap, ChevronDown, Check, Lock, PlayCircle, Star, Flame, Crown, Palette, Briefcase, Zap } from "lucide-react";
 import { SubscriptionModal } from "@/components/SubscriptionModal";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -44,33 +44,108 @@ function Dashboard() {
 
   const categories = [
     { id: "Văn phạm", icon: <BookOpen className="text-blue-500" />, desc: "Các chủ điểm ngữ pháp cốt lõi từ cơ bản đến nâng cao." },
-    { id: "Từ vựng", icon: <GraduationCap className="text-emerald-500" />, desc: "Từ vựng theo chủ đề có hình ảnh minh họa và phát âm chuẩn." },
-    { id: "Tiếng Anh Chuyên Ngành", icon: <Target className="text-indigo-500" />, desc: "Khách sạn, Du lịch, Kế toán, Xây dựng, Kiến trúc, Luật, Thể thao..." },
+    { id: "Từ vựng", icon: <Palette className="text-emerald-500" />, desc: "Từ vựng theo chủ đề có hình ảnh minh họa và phát âm chuẩn." },
+    { id: "Tiếng Anh Chuyên Ngành", icon: <Briefcase className="text-indigo-500" />, desc: "Khách sạn, Du lịch, Kế toán, Xây dựng, Kiến trúc, Luật, Thể thao..." },
     { id: "Luyện thi (TOEIC, IELTS, TOEFL)", icon: <Target className="text-rose-500" />, desc: "Các bài thi thử, đọc hiểu và trắc nghiệm thực tế." },
     { id: "Tin tức - Sự kiện", icon: <Newspaper className="text-amber-500" />, desc: "Học qua tin tức thời sự Reuters, BBC, CNN, Yle." },
     { id: "Học tiếng Anh qua bài hát", icon: <Music className="text-purple-500" />, desc: "Học qua video âm nhạc, điền từ và hát Karaoke." },
   ];
 
+  const rawCompletions = data?.rawCompletions || [];
+  const todayISO = new Date().toISOString().slice(0, 10);
+  const completionsToday = rawCompletions.filter((c: any) => c.completed_at && c.completed_at.startsWith(todayISO)).length;
+  const dailyGoal = 2;
+  const dailyProgress = Math.min((completionsToday / dailyGoal) * 100, 100);
+
+  const xp = stats?.xp ?? 0;
+  const currentLevel = Math.floor(xp / 500) + 1;
+
+  // Find most recent lesson
+  const recentCompletion = rawCompletions.length > 0 ? rawCompletions[0] : null;
+  let recentLessonData = null;
+  if (recentCompletion) {
+    recentLessonData = customLessons.find(l => l.id === recentCompletion.lesson_id);
+  }
+
   return (
     <div className="mx-auto max-w-5xl space-y-8 pb-12">
-      <section className="rounded-3xl border-4 border-primary/30 bg-gradient-to-br from-primary/15 to-accent/10 p-6 md:p-8">
-        <div className="flex items-center justify-between gap-4">
-          <div>
+      <section className="rounded-3xl border-4 border-primary/30 bg-gradient-to-br from-primary/15 to-accent/10 p-6 md:p-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
+          <Crown size={180} />
+        </div>
+
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 relative z-10">
+          <div className="flex-1">
             <p className="text-sm font-bold uppercase tracking-wide text-primary">Welcome back!</p>
-            <h1 className="mt-1 text-3xl font-extrabold md:text-4xl">
+            <h1 className="mt-1 text-3xl font-extrabold md:text-4xl text-foreground">
               {data?.profile?.display_name ?? "Learner"} 🦉
             </h1>
-            <p className="mt-2 text-muted-foreground">
-              {stats?.current_streak ? (
-                <>You&apos;re on a <span className="font-extrabold text-flame">{stats.current_streak}-day streak</span> — keep it going!</>
-              ) : (
-                "Complete a lesson today to start your streak!"
-              )}
-            </p>
+            
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-card/80 backdrop-blur-sm p-4 rounded-2xl border border-border/50 shadow-sm flex flex-col justify-center">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase text-muted-foreground flex items-center gap-1"><Star size={14} className="text-amber-500 fill-amber-500"/> Total XP</span>
+                  <span className="text-xs font-bold text-primary">Level {currentLevel}</span>
+                </div>
+                <div className="text-2xl font-extrabold">{xp} <span className="text-sm font-medium text-muted-foreground">XP</span></div>
+                <div className="mt-2 h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-amber-400 to-amber-600 transition-all duration-1000" style={{ width: `${(xp % 500) / 500 * 100}%` }}></div>
+                </div>
+                <div className="mt-1 text-[10px] text-right text-muted-foreground">{xp % 500} / 500 to Level {currentLevel + 1}</div>
+              </div>
+
+              <div className="bg-card/80 backdrop-blur-sm p-4 rounded-2xl border border-border/50 shadow-sm flex flex-col justify-center">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold uppercase text-muted-foreground flex items-center gap-1"><Target size={14} className="text-blue-500"/> Daily Goal</span>
+                  <span className="text-xs font-bold text-blue-500">{completionsToday}/{dailyGoal}</span>
+                </div>
+                <div className="text-sm font-extrabold">{completionsToday >= dailyGoal ? "Goal Reached! 🎉" : "Complete lessons"}</div>
+                <div className="mt-2 h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-1000" style={{ width: `${dailyProgress}%` }}></div>
+                </div>
+              </div>
+
+              <div className="bg-card/80 backdrop-blur-sm p-4 rounded-2xl border border-border/50 shadow-sm flex flex-col justify-center items-center text-center relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <Flame size={32} className={`mb-1 transition-transform group-hover:scale-110 ${stats?.current_streak ? "text-orange-500 fill-orange-500" : "text-muted-foreground"}`} />
+                <div className="text-2xl font-extrabold text-foreground">
+                  {stats?.current_streak ?? 0}
+                </div>
+                <div className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Day Streak</div>
+              </div>
+            </div>
           </div>
-          <div className="hidden text-6xl md:block animate-flame">🔥</div>
         </div>
       </section>
+
+      {recentLessonData && (
+        <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-extrabold flex items-center gap-2">
+              <Zap className="text-amber-500 fill-amber-500" /> Continue Learning
+            </h2>
+          </div>
+          <div className="rounded-3xl border border-border bg-card p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-xl shadow-inner border border-primary/20">
+                📝
+              </div>
+              <div>
+                <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Pick up where you left off</p>
+                <h3 className="text-lg font-extrabold text-foreground">{recentLessonData.title}</h3>
+                <p className="text-sm text-muted-foreground truncate max-w-xs">{recentLessonData.subtitle}</p>
+              </div>
+            </div>
+            <Link
+              to="/lesson/$courseId/$lessonId"
+              params={{ courseId: "custom", lessonId: recentLessonData.id }}
+              className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-extrabold shadow-[0_4px_10px_rgba(var(--primary),0.3)] hover:shadow-[0_6px_15px_rgba(var(--primary),0.4)] hover:-translate-y-0.5 active:translate-y-0 transition-all text-center"
+            >
+              RESUME
+            </Link>
+          </div>
+        </section>
+      )}
 
       <section>
         <div className="mb-6">

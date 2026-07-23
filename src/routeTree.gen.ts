@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCoursesRouteImport } from './routes/_authenticated/courses'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedShopRouteImport } from './routes/_authenticated/shop'
 import { Route as AuthenticatedArticleArticleIdRouteImport } from './routes/_authenticated/article.$articleId'
@@ -49,6 +50,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLeaderboardRoute =
+  AuthenticatedLeaderboardRouteImport.update({
+    id: '/leaderboard',
+    path: '/leaderboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/courses': typeof AuthenticatedCoursesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shop': typeof AuthenticatedShopRoute
   '/article/$articleId': typeof AuthenticatedArticleArticleIdRoute
@@ -89,6 +97,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/courses': typeof AuthenticatedCoursesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shop': typeof AuthenticatedShopRoute
   '/article/$articleId': typeof AuthenticatedArticleArticleIdRoute
@@ -102,6 +111,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/courses': typeof AuthenticatedCoursesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/shop': typeof AuthenticatedShopRoute
   '/_authenticated/article/$articleId': typeof AuthenticatedArticleArticleIdRoute
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/courses'
     | '/dashboard'
+    | '/leaderboard'
     | '/profile'
     | '/shop'
     | '/article/$articleId'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/courses'
     | '/dashboard'
+    | '/leaderboard'
     | '/profile'
     | '/shop'
     | '/article/$articleId'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/courses'
     | '/_authenticated/dashboard'
+    | '/_authenticated/leaderboard'
     | '/_authenticated/profile'
     | '/_authenticated/shop'
     | '/_authenticated/article/$articleId'
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/leaderboard': {
+      id: '/_authenticated/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof AuthenticatedLeaderboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -229,6 +249,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedCoursesRoute: typeof AuthenticatedCoursesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedShopRoute: typeof AuthenticatedShopRoute
   AuthenticatedArticleArticleIdRoute: typeof AuthenticatedArticleArticleIdRoute
@@ -239,6 +260,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedCoursesRoute: AuthenticatedCoursesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedShopRoute: AuthenticatedShopRoute,
   AuthenticatedArticleArticleIdRoute: AuthenticatedArticleArticleIdRoute,

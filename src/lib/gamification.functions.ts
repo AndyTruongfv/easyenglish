@@ -133,13 +133,14 @@ export const getMyDashboard = createServerFn({ method: "GET" })
       await Promise.all([
         supabase.from("profiles").select("*").eq("id", userId).maybeSingle(),
         supabase.from("user_stats").select("*").eq("user_id", userId).maybeSingle(),
-        supabase.from("lesson_completions").select("course_id, lesson_id, perfect").eq("user_id", userId),
+        supabase.from("lesson_completions").select("course_id, lesson_id, perfect, completed_at").eq("user_id", userId).order("completed_at", { ascending: false }),
         supabase.from("user_inventory").select("item_id").eq("user_id", userId),
       ]);
     return {
       profile: profile ?? null,
       stats: stats ?? { gems: 0, xp: 0, current_streak: 0, longest_streak: 0, streak_freezes: 0 },
       completedLessonIds: (completions ?? []).map((c) => `${c.course_id}:${c.lesson_id}`),
+      rawCompletions: completions ?? [],
       ownedItemIds: (inventory ?? []).map((i) => i.item_id),
     };
   });
@@ -170,5 +171,28 @@ export const getAllUsersProgress = createServerFn({ method: "GET" })
       profiles: profiles ?? [],
       stats: stats ?? [],
       completions: completions ?? [],
+    };
+  });
+
+export const getLeaderboard = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase } = context;
+    // Fetch user stats ordered by XP
+    const { data: stats } = await supabase
+      .from("user_stats")
+      .select("user_id, xp, gems, current_streak")
+      .order("xp", { ascending: false })
+      .limit(100);
+    
+    const userIds = stats?.map((s) => s.user_id) || [];
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, display_name, avatar_url, equipped_badge")
+      .in("id", userIds);
+
+    return {
+      stats: stats ?? [],
+      profiles: profiles ?? [],
     };
   });

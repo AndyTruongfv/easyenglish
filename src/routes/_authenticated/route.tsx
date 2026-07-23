@@ -34,6 +34,9 @@ function AppShell() {
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
 
+  const stats = data?.stats;
+  const profile = data?.profile;
+
   useEffect(() => {
     if (!profile) return;
     
@@ -76,9 +79,6 @@ function AppShell() {
     };
   }, [profile?.id, profile?.session_token]);
 
-  const stats = data?.stats;
-  const profile = data?.profile;
-
   async function handleSignOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -93,6 +93,10 @@ function AppShell() {
     if (!categoriesMap.has(cat)) categoriesMap.set(cat, []);
     categoriesMap.get(cat)!.push({ id: article.id, title: article.title });
   });
+
+  const xp = stats?.xp ?? 0;
+  const currentLevel = Math.floor(xp / 500) + 1;
+  const levelProgress = (xp % 500) / 500 * 100;
 
   return (
     <div className="flex min-h-screen flex-col bg-transparent">
@@ -111,14 +115,23 @@ function AppShell() {
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex items-center gap-6 mt-4 md:mt-0">
-          <Link to="/dashboard" className={`font-bold transition hover:text-primary ${pathname === "/dashboard" ? "text-primary" : "text-foreground"}`}>Góc học tập</Link>
-          <Link to="/courses" className={`font-bold transition hover:text-primary ${pathname === "/courses" ? "text-primary" : "text-foreground"}`}>Thư viện bài làm</Link>
+          <Link to="/dashboard" className={`font-bold pb-1 border-b-2 transition-all hover:text-primary ${pathname === "/dashboard" ? "text-primary border-primary" : "text-foreground border-transparent"}`}>Góc học tập</Link>
+          <Link to="/courses" className={`font-bold pb-1 border-b-2 transition-all hover:text-primary ${pathname === "/courses" ? "text-primary border-primary" : "text-foreground border-transparent"}`}>Thư viện bài làm</Link>
+          <Link to="/leaderboard" className={`font-bold pb-1 border-b-2 transition-all hover:text-primary ${pathname === "/leaderboard" ? "text-primary border-primary" : "text-foreground border-transparent"}`}>Leaderboard</Link>
           <Link to="/admin" className={`font-extrabold text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary transition hover:bg-primary/20 flex items-center gap-1 ${pathname === "/admin" ? "ring-2 ring-primary" : ""}`}>
             ✨ Admin
           </Link>
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
+          {/* Level Progress */}
+          <div className="flex flex-col items-end gap-1 mr-2" title={`${xp} XP`}>
+            <div className="text-[10px] font-extrabold text-primary uppercase tracking-wider">Level {currentLevel}</div>
+            <div className="w-24 h-2 bg-muted rounded-full overflow-hidden border border-border">
+              <div className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500" style={{ width: `${levelProgress}%` }}></div>
+            </div>
+          </div>
+
           <StatChip icon="🔥" value={stats?.current_streak ?? 0} color="text-flame" animate />
           <StatChip icon="💎" value={stats?.gems ?? 0} color="text-gem" animate />
           
