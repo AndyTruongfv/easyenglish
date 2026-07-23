@@ -7,6 +7,7 @@ import { Lesson } from "@/data/courses";
 import { getCustomLessons } from "@/lib/custom_lessons";
 import { BookOpen, Target, Newspaper, Music, GraduationCap, ChevronDown, Check, Lock, PlayCircle, Star, Flame, Crown, Palette, Briefcase, Zap } from "lucide-react";
 import { SubscriptionModal } from "@/components/SubscriptionModal";
+import { getSubscriptionForUser } from "@/lib/custom_subscriptions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -27,7 +28,10 @@ function Dashboard() {
   const [customLessons, setCustomLessons] = useState<Lesson[]>([]);
   const [expandedCategory, setExpandedCategory] = useState<string | null>("Học tiếng Anh qua bài hát");
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  const isVIP = data?.profile?.is_vip === true;
+  const isVIP = data?.profile?.is_vip === true || (data?.profile as any)?.role === 'admin';
+  const sub = data?.profile?.id ? getSubscriptionForUser(data.profile.id) : null;
+  const unlockedModules = sub?.unlockedModules || [];
+  const manualVIP = sub?.tier === "VIP" || sub?.tier === "Yearly" || sub?.tier === "Monthly" || sub?.tier === "Hourly";
 
   useEffect(() => {
     setCustomLessons(getCustomLessons());
@@ -199,12 +203,13 @@ function Dashboard() {
                             isFree = idx === 0; // First lesson is free as sample
                           }
 
-                          const isLocked = !isVIP && !isFree;
+                          const isUnlockedByAdmin = manualVIP || unlockedModules.includes(cat.id);
+                          const isLocked = !isVIP && !isFree && !isUnlockedByAdmin;
 
                           return (
                             <Link
                               key={lesson.id}
-                              to={isLocked ? "#" : "/lesson/$courseId/$lessonId"}
+                              to={(isLocked ? "#" : "/lesson/$courseId/$lessonId") as any}
                               params={isLocked ? {} as any : { courseId: "custom", lessonId: lesson.id }}
                               onClick={(e) => {
                                 if (isLocked) {

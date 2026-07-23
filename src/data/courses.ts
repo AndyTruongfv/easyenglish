@@ -256,10 +256,10 @@ export const COURSES: Course[] = [
   {
     id: "fun-and-games",
     title: "Fun & Games",
-    description: "Karaoke, Fill-in Songs, Crosswords.",
+    description: "Interactive vocabulary mini-games: Flashcards, Word Matching, Scramble & Memory games.",
     color: "gold",
-    emoji: "🎵",
-    locked: true,
+    emoji: "🎮",
+    locked: false,
     lessons: [],
   }
 ];

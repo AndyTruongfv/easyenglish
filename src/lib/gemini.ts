@@ -240,13 +240,13 @@ Style: inspired by ${source} (journalistic, factual, balanced).
 
 Include:
 1. Headline and dateline/byline
-2. Full article body: 450-600 words appropriate for level ${level}
+2. Full article body: 450-600 words appropriate for level ${level}. IMPORTANT: The original article body must NOT contain any fill-in-the-blank gaps or curly braces {}. Display the full unedited article text here.
 3. Vocabulary box: 10 key words/phrases with IPA, English definition, Vietnamese meaning
-4. 5 comprehension questions with fill-in-blank answers using {answer} format
+4. Exercise Section: 5 comprehension questions with fill-in-blank answers using {answer} format. These MUST be placed at the very end of the output in a separate exercise section.
 5. 2 discussion questions for speaking practice (MUST be explicitly numbered 1. and 2. using an <ol> list)
 
 STRICT HTML OUTPUT (no markdown):
-- Article wrapper: <div style="background:rgba(99,102,241,0.06);border:2px solid #6366f1;border-radius:16px;padding:16px;margin-bottom:16px;line-height:1.9;font-size:14px;"> (IMPORTANT: CLOSE this div </div> immediately after the article body! Do NOT put the vocabulary or questions inside this wrapper!)
+- Article wrapper: <div style="background:rgba(99,102,241,0.06);border:2px solid #6366f1;border-radius:16px;padding:16px;margin-bottom:16px;line-height:1.9;font-size:14px;"> (IMPORTANT: CLOSE this div </div> immediately after the article body! Do NOT put the vocabulary or exercises inside this wrapper!)
 - Section headers: <h3 style="color:#4f46e5;margin-top:20px;">Section Name</h3>
 - Headline: <h2 style="font-size:20px;font-weight:900;color:#1e1b4b;margin-bottom:4px;">HEADLINE</h2>
 - Source line: <p style="font-size:11px;color:#6b7280;margin-bottom:14px;">Source: ${source} | Level: ${level} | Educational Use Only</p>

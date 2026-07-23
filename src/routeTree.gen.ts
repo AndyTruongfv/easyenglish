@@ -15,10 +15,16 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedCoursesRouteImport } from './routes/_authenticated/courses'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedGamesRouteImport } from './routes/_authenticated/games'
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedShopRouteImport } from './routes/_authenticated/shop'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedAdminCoursesRouteImport } from './routes/_authenticated/admin/courses'
+import { Route as AuthenticatedAdminNewsRouteImport } from './routes/_authenticated/admin/news'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedArticleArticleIdRouteImport } from './routes/_authenticated/article.$articleId'
+import { Route as AuthenticatedGamesGameIdRouteImport } from './routes/_authenticated/games.$gameId'
 import { Route as AuthenticatedLessonCourseIdLessonIdRouteImport } from './routes/_authenticated/lesson.$courseId.$lessonId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -50,6 +56,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGamesRoute = AuthenticatedGamesRouteImport.update({
+  id: '/games',
+  path: '/games',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLeaderboardRoute =
   AuthenticatedLeaderboardRouteImport.update({
     id: '/leaderboard',
@@ -66,11 +77,38 @@ const AuthenticatedShopRoute = AuthenticatedShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminCoursesRoute =
+  AuthenticatedAdminCoursesRouteImport.update({
+    id: '/courses',
+    path: '/courses',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminNewsRoute = AuthenticatedAdminNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedArticleArticleIdRoute =
   AuthenticatedArticleArticleIdRouteImport.update({
     id: '/article/$articleId',
     path: '/article/$articleId',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedGamesGameIdRoute =
+  AuthenticatedGamesGameIdRouteImport.update({
+    id: '/$gameId',
+    path: '/$gameId',
+    getParentRoute: () => AuthenticatedGamesRoute,
   } as any)
 const AuthenticatedLessonCourseIdLessonIdRoute =
   AuthenticatedLessonCourseIdLessonIdRouteImport.update({
@@ -82,25 +120,36 @@ const AuthenticatedLessonCourseIdLessonIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/courses': typeof AuthenticatedCoursesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/games': typeof AuthenticatedGamesRouteWithChildren
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shop': typeof AuthenticatedShopRoute
+  '/admin/courses': typeof AuthenticatedAdminCoursesRoute
+  '/admin/news': typeof AuthenticatedAdminNewsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/article/$articleId': typeof AuthenticatedArticleArticleIdRoute
+  '/games/$gameId': typeof AuthenticatedGamesGameIdRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/lesson/$courseId/$lessonId': typeof AuthenticatedLessonCourseIdLessonIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/courses': typeof AuthenticatedCoursesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/games': typeof AuthenticatedGamesRouteWithChildren
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/shop': typeof AuthenticatedShopRoute
+  '/admin/courses': typeof AuthenticatedAdminCoursesRoute
+  '/admin/news': typeof AuthenticatedAdminNewsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/article/$articleId': typeof AuthenticatedArticleArticleIdRoute
+  '/games/$gameId': typeof AuthenticatedGamesGameIdRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/lesson/$courseId/$lessonId': typeof AuthenticatedLessonCourseIdLessonIdRoute
 }
 export interface FileRoutesById {
@@ -108,13 +157,19 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/courses': typeof AuthenticatedCoursesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/games': typeof AuthenticatedGamesRouteWithChildren
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/shop': typeof AuthenticatedShopRoute
+  '/_authenticated/admin/courses': typeof AuthenticatedAdminCoursesRoute
+  '/_authenticated/admin/news': typeof AuthenticatedAdminNewsRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/article/$articleId': typeof AuthenticatedArticleArticleIdRoute
+  '/_authenticated/games/$gameId': typeof AuthenticatedGamesGameIdRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/lesson/$courseId/$lessonId': typeof AuthenticatedLessonCourseIdLessonIdRoute
 }
 export interface FileRouteTypes {
@@ -125,22 +180,33 @@ export interface FileRouteTypes {
     | '/admin'
     | '/courses'
     | '/dashboard'
+    | '/games'
     | '/leaderboard'
     | '/profile'
     | '/shop'
+    | '/admin/courses'
+    | '/admin/news'
+    | '/admin/users'
     | '/article/$articleId'
+    | '/games/$gameId'
+    | '/admin/'
     | '/lesson/$courseId/$lessonId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
-    | '/admin'
     | '/courses'
     | '/dashboard'
+    | '/games'
     | '/leaderboard'
     | '/profile'
     | '/shop'
+    | '/admin/courses'
+    | '/admin/news'
+    | '/admin/users'
     | '/article/$articleId'
+    | '/games/$gameId'
+    | '/admin'
     | '/lesson/$courseId/$lessonId'
   id:
     | '__root__'
@@ -150,10 +216,16 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/courses'
     | '/_authenticated/dashboard'
+    | '/_authenticated/games'
     | '/_authenticated/leaderboard'
     | '/_authenticated/profile'
     | '/_authenticated/shop'
+    | '/_authenticated/admin/courses'
+    | '/_authenticated/admin/news'
+    | '/_authenticated/admin/users'
     | '/_authenticated/article/$articleId'
+    | '/_authenticated/games/$gameId'
+    | '/_authenticated/admin/'
     | '/_authenticated/lesson/$courseId/$lessonId'
   fileRoutesById: FileRoutesById
 }
@@ -207,6 +279,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/games': {
+      id: '/_authenticated/games'
+      path: '/games'
+      fullPath: '/games'
+      preLoaderRoute: typeof AuthenticatedGamesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/leaderboard': {
       id: '/_authenticated/leaderboard'
       path: '/leaderboard'
@@ -228,12 +307,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShopRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/courses': {
+      id: '/_authenticated/admin/courses'
+      path: '/courses'
+      fullPath: '/admin/courses'
+      preLoaderRoute: typeof AuthenticatedAdminCoursesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/news': {
+      id: '/_authenticated/admin/news'
+      path: '/news'
+      fullPath: '/admin/news'
+      preLoaderRoute: typeof AuthenticatedAdminNewsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/article/$articleId': {
       id: '/_authenticated/article/$articleId'
       path: '/article/$articleId'
       fullPath: '/article/$articleId'
       preLoaderRoute: typeof AuthenticatedArticleArticleIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/games/$gameId': {
+      id: '/_authenticated/games/$gameId'
+      path: '/$gameId'
+      fullPath: '/games/$gameId'
+      preLoaderRoute: typeof AuthenticatedGamesGameIdRouteImport
+      parentRoute: typeof AuthenticatedGamesRoute
     }
     '/_authenticated/lesson/$courseId/$lessonId': {
       id: '/_authenticated/lesson/$courseId/$lessonId'
@@ -245,10 +359,39 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminCoursesRoute: typeof AuthenticatedAdminCoursesRoute
+  AuthenticatedAdminNewsRoute: typeof AuthenticatedAdminNewsRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminCoursesRoute: AuthenticatedAdminCoursesRoute,
+  AuthenticatedAdminNewsRoute: AuthenticatedAdminNewsRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedGamesRouteChildren {
+  AuthenticatedGamesGameIdRoute: typeof AuthenticatedGamesGameIdRoute
+}
+
+const AuthenticatedGamesRouteChildren: AuthenticatedGamesRouteChildren = {
+  AuthenticatedGamesGameIdRoute: AuthenticatedGamesGameIdRoute,
+}
+
+const AuthenticatedGamesRouteWithChildren =
+  AuthenticatedGamesRoute._addFileChildren(AuthenticatedGamesRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedCoursesRoute: typeof AuthenticatedCoursesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedGamesRoute: typeof AuthenticatedGamesRouteWithChildren
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedShopRoute: typeof AuthenticatedShopRoute
@@ -257,9 +400,10 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedCoursesRoute: AuthenticatedCoursesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedGamesRoute: AuthenticatedGamesRouteWithChildren,
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedShopRoute: AuthenticatedShopRoute,

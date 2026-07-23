@@ -115,10 +115,10 @@ function AppShell() {
 
         {/* Desktop Menu */}
         <nav className="hidden md:flex items-center gap-6 mt-4 md:mt-0">
-          <Link to="/dashboard" className={`font-bold pb-1 border-b-2 transition-all hover:text-primary ${pathname === "/dashboard" ? "text-primary border-primary" : "text-foreground border-transparent"}`}>Góc học tập</Link>
-          <Link to="/courses" className={`font-bold pb-1 border-b-2 transition-all hover:text-primary ${pathname === "/courses" ? "text-primary border-primary" : "text-foreground border-transparent"}`}>Thư viện bài làm</Link>
-          <Link to="/leaderboard" className={`font-bold pb-1 border-b-2 transition-all hover:text-primary ${pathname === "/leaderboard" ? "text-primary border-primary" : "text-foreground border-transparent"}`}>Leaderboard</Link>
-          <Link to="/admin" className={`font-extrabold text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary transition hover:bg-primary/20 flex items-center gap-1 ${pathname === "/admin" ? "ring-2 ring-primary" : ""}`}>
+          <Link to="/dashboard" className={`font-bold pb-1 border-b-2 transition-all hover:text-primary ${pathname.startsWith("/dashboard") ? "text-primary border-primary" : "text-foreground border-transparent"}`}>Góc học tập</Link>
+          <Link to="/courses" className={`font-bold pb-1 border-b-2 transition-all hover:text-primary ${pathname.startsWith("/courses") || pathname.startsWith("/lesson") ? "text-primary border-primary" : "text-foreground border-transparent"}`}>Thư viện bài làm</Link>
+          <Link to="/leaderboard" className={`font-bold pb-1 border-b-2 transition-all hover:text-primary ${pathname.startsWith("/leaderboard") ? "text-primary border-primary" : "text-foreground border-transparent"}`}>Leaderboard</Link>
+          <Link to="/admin" className={`font-extrabold text-xs px-3 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-primary transition hover:bg-primary/20 flex items-center gap-1 ${pathname.startsWith("/admin") ? "ring-2 ring-primary" : ""}`}>
             ✨ Admin
           </Link>
         </nav>
@@ -141,7 +141,7 @@ function AppShell() {
           
           <div className="relative group">
             <button className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary/50 bg-card font-extrabold shadow-[0_0_15px_rgba(var(--primary),0.3)] hover:scale-110 transition-transform cursor-pointer">
-              {profile?.equipped_badge ? getBadgeEmoji(profile.equipped_badge) : (profile?.display_name?.[0]?.toUpperCase() ?? "🐜")}
+              {profile?.equipped_badge ? getBadgeEmoji(profile.equipped_badge) : (profile?.display_name?.[0]?.toUpperCase() ?? "🦉")}
             </button>
             <div className="absolute top-full right-0 mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
               <div className="glass-panel p-2 flex flex-col shadow-2xl rounded-xl border border-white/20">
@@ -156,7 +156,7 @@ function AppShell() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 md:px-8 md:py-10">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 pt-10 pb-6 md:px-8 md:pt-14 md:pb-10">
         <Outlet />
       </main>
     </div>

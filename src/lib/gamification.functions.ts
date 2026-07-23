@@ -81,6 +81,66 @@ export const completeLesson = createServerFn({ method: "POST" })
     return { gemsEarned, xpEarned, current_streak, perfect };
   });
 
+export const completeGame = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((d: unknown) => z.object({ gameId: z.string().min(1) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const xpEarned = 20;
+
+    const { data: stats } = await supabase
+      .from("user_stats")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    const today = todayISO();
+    let current_streak = stats?.current_streak ?? 0;
+    let longest_streak = stats?.longest_streak ?? 0;
+
+    if (!stats?.last_active_date) {
+      current_streak = 1;
+    } else if (stats.last_active_date === today) {
+      // same day
+    } else {
+      const gap = daysBetween(stats.last_active_date, today);
+      if (gap === 1) current_streak += 1;
+      else if (gap > 1 && (stats.streak_freezes ?? 0) > 0 && gap === 2) {
+        current_streak += 1;
+        await supabase
+          .from("user_stats")
+          .update({ streak_freezes: (stats.streak_freezes ?? 1) - 1 })
+          .eq("user_id", userId);
+      } else {
+        current_streak = 1;
+      }
+    }
+    longest_streak = Math.max(longest_streak, current_streak);
+
+    await supabase.from("user_stats").upsert({
+      user_id: userId,
+      gems: stats?.gems ?? 0,
+      xp: (stats?.xp ?? 0) + xpEarned,
+      current_streak,
+      longest_streak,
+      last_active_date: today,
+      streak_freezes: stats?.streak_freezes ?? 0,
+      updated_at: new Date().toISOString(),
+    });
+
+    await supabase.from("lesson_completions").insert({
+      user_id: userId,
+      course_id: "fun-and-games",
+      lesson_id: data.gameId,
+      score: 1,
+      total: 1,
+      gems_earned: 0,
+      perfect: true,
+    });
+
+    return { xpEarned, current_streak };
+  });
+
 export const buyShopItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ itemId: z.string().min(1) }).parse(d))
@@ -136,8 +196,19 @@ export const getMyDashboard = createServerFn({ method: "GET" })
         supabase.from("lesson_completions").select("course_id, lesson_id, perfect, completed_at").eq("user_id", userId).order("completed_at", { ascending: false }),
         supabase.from("user_inventory").select("item_id").eq("user_id", userId),
       ]);
+
+    // ABSOLUTE ADMIN PRIVILEGES
+    let enrichedProfile = profile;
+    const isDev = process.env.NODE_ENV === "development";
+    if (enrichedProfile) {
+      if ((enrichedProfile as any).role === "admin" || isDev) {
+        (enrichedProfile as any).is_vip = true;
+        (enrichedProfile as any).role = "admin";
+      }
+    }
+
     return {
-      profile: profile ?? null,
+      profile: enrichedProfile ?? null,
       stats: stats ?? { gems: 0, xp: 0, current_streak: 0, longest_streak: 0, streak_freezes: 0 },
       completedLessonIds: (completions ?? []).map((c) => `${c.course_id}:${c.lesson_id}`),
       rawCompletions: completions ?? [],
