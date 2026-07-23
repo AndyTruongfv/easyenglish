@@ -1,0 +1,133 @@
+
+function LegacyClozeView({
+  data,
+  onFinish,
+}: {
+  data: import("@/data/courses").LegacyClozeData;
+  onFinish: (score: number) => void;
+}) {
+  const [inputs, setInputs] = useState<Record<number, string>>({});
+  const [checked, setChecked] = useState(false);
+  const [hints, setHints] = useState<Record<number, number>>({});
+  const [focusedGap, setFocusedGap] = useState<number | null>(null);
+
+  const totalGaps = data.answers.length;
+
+  const handleCheck = () => {
+    setChecked(true);
+  };
+
+  const handleContinue = () => {
+    let score = 0;
+    for (let i = 0; i < totalGaps; i++) {
+      if ((inputs[i] || "").trim().toLowerCase() === (data.answers[i] || "").trim().toLowerCase()) {
+        score++;
+      }
+    }
+    onFinish(score);
+  };
+
+  const handleHint = () => {
+    if (focusedGap === null) return;
+    const answer = data.answers[focusedGap];
+    if (!answer) return;
+
+    setHints((prev) => {
+      const currentHintLen = prev[focusedGap] || 0;
+      if (currentHintLen < answer.length) {
+        const newHintLen = currentHintLen + 1;
+        setInputs((prevInputs) => ({
+          ...prevInputs,
+          [focusedGap]: answer.substring(0, newHintLen),
+        }));
+        return { ...prev, [focusedGap]: newHintLen };
+      }
+      return prev;
+    });
+  };
+
+  const segments = data.htmlText.split(/\{(\d+)\}/);
+
+  return (
+    <div className="flex flex-1 flex-col">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-extrabold md:text-3xl">Fill in the blanks</h2>
+        <button
+          onClick={handleHint}
+          disabled={focusedGap === null || checked}
+          className="btn-chunky bg-secondary text-secondary-foreground active:btn-chunky-active disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          💡 Hint
+        </button>
+      </div>
+
+      <div className="glass-panel mb-8 flex-1 overflow-y-auto rounded-3xl p-6 text-lg leading-loose shadow-xl">
+        {segments.map((segment, idx) => {
+          if (idx % 2 === 0) {
+            return (
+              <span
+                key={idx}
+                dangerouslySetInnerHTML={{ __html: segment }}
+                className="inline"
+              />
+            );
+          } else {
+            const gapId = parseInt(segment, 10);
+            const answer = data.answers[gapId] || "";
+            const isCorrect =
+              (inputs[gapId] || "").trim().toLowerCase() === answer.trim().toLowerCase();
+
+            return (
+              <input
+                key={idx}
+                type="text"
+                value={inputs[gapId] || ""}
+                onChange={(e) => {
+                  if (!checked) {
+                    setInputs({ ...inputs, [gapId]: e.target.value });
+                  }
+                }}
+                onFocus={() => setFocusedGap(gapId)}
+                onBlur={() => {
+                  // Small delay to allow Hint button click before losing focus
+                  setTimeout(() => {
+                    setFocusedGap((prev) => (prev === gapId ? null : prev));
+                  }, 200);
+                }}
+                disabled={checked && isCorrect}
+                className={`mx-2 inline-block w-32 rounded-xl border-b-4 border-l-2 border-r-2 border-t-2 bg-background/50 px-2 py-1 text-center font-extrabold outline-none transition-colors ${
+                  checked
+                    ? isCorrect
+                      ? "border-primary text-primary"
+                      : "border-destructive text-destructive"
+                    : focusedGap === gapId
+                      ? "border-primary"
+                      : "border-border"
+                }`}
+                placeholder="..."
+              />
+            );
+          }
+        })}
+      </div>
+
+      <div className="mt-auto pt-4">
+        {!checked ? (
+          <button
+            onClick={handleCheck}
+            className="btn-chunky w-full bg-primary text-primary-foreground active:btn-chunky-active"
+          >
+            Check Answers
+          </button>
+        ) : (
+          <button
+            onClick={handleContinue}
+            className="btn-chunky w-full bg-primary text-primary-foreground active:btn-chunky-active"
+          >
+            Continue <ArrowRight size={18} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
